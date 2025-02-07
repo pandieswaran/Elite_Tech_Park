@@ -21,7 +21,8 @@ UserRouter.route('/login').post(UserValid.Userlogin_Validation, UserCtrl.loginUs
 //View All the Products
 UserRouter.route("/products").get(verifyToken, authorizeRoles("User"),UserCtrl.getAllProducts);
 
-
+//Search the product and Pagination
+UserRouter.route("/search").get(UserCtrl.searchProductsByName)
 
 
 

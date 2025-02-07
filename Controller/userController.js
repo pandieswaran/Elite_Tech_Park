@@ -113,6 +113,7 @@ export const staffall = async (req, res) => {
     }
 }
 
+
 export const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find();
@@ -145,3 +146,40 @@ export const getAllProducts = async (req, res) => {
         res.status(500).json({ message: "Error fetching products", error });
     }
 };
+
+//Search Product and Pagination
+export const searchProductsByName = async (req, res) => {
+    try {
+        let { page, limit, search } = req.query;
+
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10;
+
+        const query = {};
+
+    
+        if (search) {
+            query.name = { $regex: search, $options: "i" }; 
+        }
+
+        // Get total product count
+        const totalProducts = await Product.countDocuments(query);
+
+        // Fetch products with pagination
+        const products = await Product.find(query)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort({ createdAt: 1 }); 
+
+        res.status(200).json({
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: page,
+            totalProducts,
+            products
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching products", error });
+    }
+};
+
